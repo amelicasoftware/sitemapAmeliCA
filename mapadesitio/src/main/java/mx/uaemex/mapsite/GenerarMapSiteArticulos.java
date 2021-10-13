@@ -157,7 +157,7 @@ public class GenerarMapSiteArticulos {
 		List<ModeloArticuloSitemaps> listaClaves = new ArrayList<ModeloArticuloSitemaps>();
 		List<Object[]> listaobjArt = null;
 		try {
-			Query qAux = em.createNativeQuery("select * from tblentrev");
+			Query qAux = em.createNativeQuery("select * from tblentrev where edoentrev = '1'");
 			listaobjArt = (List<Object[]>) qAux.getResultList();
 			for (Object[] resultElement : listaobjArt) {
 				ModeloArticuloSitemaps langArt = new ModeloArticuloSitemaps();
