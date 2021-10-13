@@ -49,14 +49,10 @@ public class GenerarMapSiteArticulos {
 		for (int i = 0; i < numeroArchivos; i++) {
 			for (int j = 0; j < 50000; j++) {
 				if (clavesArticulo.size() > (j + (i * 50000))) {
-					String fecha = getFechaUltimaModificacion();
 					TUrl tURL = new TUrl();
 					tURL.setChangefreq(TChangeFreq.MONTHLY);
-					String[] parts = clavesArticulo.get(j + (i * 50000)).getEdoJats().split(" ");
-					//if(!parts[0].equals(null))
-						//fecha = parts[0];
 					//System.out.println("**********************************"+clavesArticulo.get(j + (i * 50000)).getEdoJats());
-					tURL.setLastmod(fecha);
+					tURL.setLastmod(clavesArticulo.get(j + (i * 50000)).getEdoJats());
 					tURL.setLoc(
 							"http://portal.amelica.org/ameli/jatsRepo/"+ clavesArticulo.get(j + (i * 50000)).getClaveRevista()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+"/index.html");
 					numeroLinks++;
@@ -65,7 +61,7 @@ public class GenerarMapSiteArticulos {
 					
 					TUrl tURL2 = new TUrl();
 					tURL2.setChangefreq(TChangeFreq.MONTHLY);
-					tURL2.setLastmod(getFechaUltimaModificacion());
+					tURL2.setLastmod(clavesArticulo.get(j + (i * 50000)).getEdoJats());
 					tURL2.setLoc(
 							"http://portal.amelica.org/ameli/jatsRepo/"+ clavesArticulo.get(j + (i * 50000)).getClaveRevista()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+".pdf");
 					numeroLinks++;
@@ -74,7 +70,7 @@ public class GenerarMapSiteArticulos {
 					
 					TUrl tURL3 = new TUrl();
 					tURL3.setChangefreq(TChangeFreq.MONTHLY);
-					tURL3.setLastmod(getFechaUltimaModificacion());
+					tURL3.setLastmod(clavesArticulo.get(j + (i * 50000)).getEdoJats());
 					tURL3.setLoc(
 							"http://portal.amelica.org/ameli/jatsRepo/"+ clavesArticulo.get(j + (i * 50000)).getClaveRevista()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+"/html/index.html");
 					numeroLinks++;
@@ -83,7 +79,7 @@ public class GenerarMapSiteArticulos {
 					
 					TUrl tURL4 = new TUrl();
 					tURL4.setChangefreq(TChangeFreq.MONTHLY);
-					tURL4.setLastmod(getFechaUltimaModificacion());
+					tURL4.setLastmod(clavesArticulo.get(j + (i * 50000)).getEdoJats());
 					tURL4.setLoc(
 							"http://portal.amelica.org/ameli/jatsRepo/"+ clavesArticulo.get(j + (i * 50000)).getClaveRevista()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+"/movil/index.html");
 					numeroLinks++;
@@ -142,15 +138,21 @@ public class GenerarMapSiteArticulos {
 		List<Object[]> listaobjArt = null;
 		try {
 			// Corregido con JATS
-			Query qAux = em.createNativeQuery("select distinct tblentrev.cveentrev,tblrevtit.cverevtit from tblentrev natural inner join tblrevtit");
-			//Query qAux = em.createNativeQuery("select distinct tblentrev.cveentrev,tblrevtit.cverevtit, tblrevtit.fecultmod from tblentrev natural inner join tblrevtit");
+			//Query qAux = em.createNativeQuery("select distinct tblentrev.cveentrev,tblrevtit.cverevtit from tblentrev natural inner join tblrevtit");
+			Query qAux = em.createNativeQuery("select distinct tblentrev.cveentrev,tblrevtit.cverevtit, tblrevtit.fecultmod from tblentrev natural inner join tblrevtit");
 			// listaClaves = (List<Long>) qAux.getResultList();
 
 			listaobjArt = (List<Object[]>) qAux.getResultList();
+			System.out.println("***********************************"+listaobjArt.size());
 			for (Object[] resultElement : listaobjArt) {
 				ModeloArticuloSitemaps langArt = new ModeloArticuloSitemaps();
 				langArt.setClave(resultElement[1].toString());
-				langArt.setEdoJats(resultElement[1].toString());
+				if(resultElement[2]==null)
+					langArt.setEdoJats(getFechaUltimaModificacion());
+				else {
+					String[] part = resultElement[2].toString().split(" ");
+					langArt.setEdoJats(part[0]);
+				}
 				langArt.setClaveRevista(resultElement[0].toString());
 				langArt.setJatsPDF(resultElement[1].toString());
 				listaClaves.add(langArt);
