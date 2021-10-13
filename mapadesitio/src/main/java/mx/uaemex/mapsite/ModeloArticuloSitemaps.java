@@ -2,9 +2,8 @@ package mx.uaemex.mapsite;
 
 public class ModeloArticuloSitemaps {
 	private String clave;
-	private String edoJats;
+	private String fechaUltMod;
 	private String claveRevista;
-	private String jatsPDF;
 
 	public ModeloArticuloSitemaps() {
 	}
@@ -17,12 +16,12 @@ public class ModeloArticuloSitemaps {
 		this.clave = clave;
 	}
 
-	public String getEdoJats() {
-		return edoJats;
+	public String getFechaUltMod() {
+		return fechaUltMod;
 	}
 
-	public void setEdoJats(String edoJats) {
-		this.edoJats = edoJats;
+	public void setFechaUltMod(String fechaUltMod) {
+		this.fechaUltMod = fechaUltMod;
 	}
 
 	public String getClaveRevista() {
@@ -31,13 +30,5 @@ public class ModeloArticuloSitemaps {
 
 	public void setClaveRevista(String claveRevista) {
 		this.claveRevista = claveRevista;
-	}
-
-	public String getJatsPDF() {
-		return jatsPDF;
-	}
-
-	public void setJatsPDF(String jatsPDF) {
-		this.jatsPDF = jatsPDF;
 	}
 }

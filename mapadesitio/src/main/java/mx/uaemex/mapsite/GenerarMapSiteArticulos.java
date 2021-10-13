@@ -20,26 +20,18 @@ import mx.uaemex.redalyc.XMLarticulos.Urlset;
 public class GenerarMapSiteArticulos {
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("aplicacion");
 	EntityManager em = emf.createEntityManager();
-	private String fechaUltimaModificacion = "2021-10-12";
+	private String fechaUltimaModificacion = "2021-10-12"; //se cambia cada que se corre el progrma
 
+	//metodo para crear XML de articilos
 	public void crearXMLArticulos() {
 		int numeroLinks = 0;
 		List<ModeloArticuloSitemaps> clavesArticulo = this.getClaveArticulo();
-		/*
-		 * for(Object[] resultElement : clavesArticulo) {
-		 * System.out.println(resultElement[0].toString()); }
-		 */
-		
 		BigDecimal bigDecimal = new BigDecimal("1.0");
 		Urlset urlSet = new Urlset();
-		Urlset urlSetRevistas = new Urlset();
-		Urlset urlSetExportar = new Urlset();
-		Urlset urlSetVisor = new Urlset();
 		Urlset urlSetMovil = new Urlset();
 		Urlset urlSetHTML = new Urlset();
 		Urlset urlSetPDF = new Urlset();
 		int numeroArchivos = 0;
-		int contadorArticulosJats = 0;
 		System.out.println("todo ok");
 		
 		if (clavesArticulo.size() > 50000L) {
@@ -49,37 +41,37 @@ public class GenerarMapSiteArticulos {
 		for (int i = 0; i < numeroArchivos; i++) {
 			for (int j = 0; j < 50000; j++) {
 				if (clavesArticulo.size() > (j + (i * 50000))) {
+					//para los articulos en el visor redalyc
 					TUrl tURL = new TUrl();
 					tURL.setChangefreq(TChangeFreq.MONTHLY);
-					//System.out.println("**********************************"+clavesArticulo.get(j + (i * 50000)).getEdoJats());
-					tURL.setLastmod(clavesArticulo.get(j + (i * 50000)).getEdoJats());
+					tURL.setLastmod(clavesArticulo.get(j + (i * 50000)).getFechaUltMod());
 					tURL.setLoc(
 							"http://portal.amelica.org/ameli/jatsRepo/"+ clavesArticulo.get(j + (i * 50000)).getClaveRevista()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+"/index.html");
 					numeroLinks++;
 					tURL.setPriority(bigDecimal);
 					urlSet.getUrl().add(tURL);
-					
+					//para los articulos en PDF
 					TUrl tURL2 = new TUrl();
 					tURL2.setChangefreq(TChangeFreq.MONTHLY);
-					tURL2.setLastmod(clavesArticulo.get(j + (i * 50000)).getEdoJats());
+					tURL2.setLastmod(clavesArticulo.get(j + (i * 50000)).getFechaUltMod());
 					tURL2.setLoc(
 							"http://portal.amelica.org/ameli/jatsRepo/"+ clavesArticulo.get(j + (i * 50000)).getClaveRevista()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+".pdf");
 					numeroLinks++;
 					tURL2.setPriority(bigDecimal);
 					urlSetPDF.getUrl().add(tURL2);
-					
+					//par los articulos en HTML
 					TUrl tURL3 = new TUrl();
 					tURL3.setChangefreq(TChangeFreq.MONTHLY);
-					tURL3.setLastmod(clavesArticulo.get(j + (i * 50000)).getEdoJats());
+					tURL3.setLastmod(clavesArticulo.get(j + (i * 50000)).getFechaUltMod());
 					tURL3.setLoc(
 							"http://portal.amelica.org/ameli/jatsRepo/"+ clavesArticulo.get(j + (i * 50000)).getClaveRevista()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+"/html/index.html");
 					numeroLinks++;
 					tURL3.setPriority(bigDecimal);
 					urlSetHTML.getUrl().add(tURL3);
-					
+					//par los articulos en formato movil
 					TUrl tURL4 = new TUrl();
 					tURL4.setChangefreq(TChangeFreq.MONTHLY);
-					tURL4.setLastmod(clavesArticulo.get(j + (i * 50000)).getEdoJats());
+					tURL4.setLastmod(clavesArticulo.get(j + (i * 50000)).getFechaUltMod());
 					tURL4.setLoc(
 							"http://portal.amelica.org/ameli/jatsRepo/"+ clavesArticulo.get(j + (i * 50000)).getClaveRevista()+"/"+clavesArticulo.get(j + (i * 50000)).getClave()+"/movil/index.html");
 					numeroLinks++;
@@ -89,6 +81,7 @@ public class GenerarMapSiteArticulos {
 				
 				
 			}
+			//metodos para crear los archivos
 			escribirArchivo("mapsitearticulos" + i, urlSet);
 			urlSet.getUrl().clear();
 			escribirArchivo("mapsitearticulosPDF" + i, urlSetPDF);
@@ -99,7 +92,7 @@ public class GenerarMapSiteArticulos {
 			urlSetMovil.getUrl().clear();
 		}
 	}
-	
+	//metodo par crear xml revistas
 	public void crearXMLrevistas() {
 		int numeroLinks = 0;
 		List<ModeloArticuloSitemaps> clavesArticulo = this.getClaveRevista();
@@ -107,7 +100,6 @@ public class GenerarMapSiteArticulos {
 		Urlset urlSetRevistas = new Urlset();
 		int numeroArchivos = 0;
 		int contadorArticulosJats = 0;
-		System.out.println("todo ok");
 		if (clavesArticulo.size() > 50000L) {
 			numeroArchivos = (clavesArticulo.size() / 50000) + 1;
 		} else
@@ -124,37 +116,31 @@ public class GenerarMapSiteArticulos {
 					tURL1.setPriority(bigDecimal);
 					urlSetRevistas.getUrl().add(tURL1);
 				}
-				
-				
 			}
 			escribirArchivo("mapsitearticulosRevistas" + i, urlSetRevistas);
 			urlSetRevistas.getUrl().clear();
 		}
 	}
-
+	//metodo pra obtener los articulos de base de datos y crear una lista de objetos con los resultados
 	public List<ModeloArticuloSitemaps> getClaveArticulo() {
 
 		List<ModeloArticuloSitemaps> listaClaves = new ArrayList<ModeloArticuloSitemaps>();
 		List<Object[]> listaobjArt = null;
 		try {
-			// Corregido con JATS
 			//Query qAux = em.createNativeQuery("select distinct tblentrev.cveentrev,tblrevtit.cverevtit from tblentrev natural inner join tblrevtit");
 			Query qAux = em.createNativeQuery("select distinct tblentrev.cveentrev,tblrevtit.cverevtit, tblrevtit.fecultmod from tblentrev natural inner join tblrevtit");
-			// listaClaves = (List<Long>) qAux.getResultList();
-
 			listaobjArt = (List<Object[]>) qAux.getResultList();
-			System.out.println("***********************************"+listaobjArt.size());
+			//System.out.println("***********************************"+listaobjArt.size());
 			for (Object[] resultElement : listaobjArt) {
 				ModeloArticuloSitemaps langArt = new ModeloArticuloSitemaps();
 				langArt.setClave(resultElement[1].toString());
 				if(resultElement[2]==null)
-					langArt.setEdoJats(getFechaUltimaModificacion());
+					langArt.setFechaUltMod(getFechaUltimaModificacion());
 				else {
 					String[] part = resultElement[2].toString().split(" ");
-					langArt.setEdoJats(part[0]);
+					langArt.setFechaUltMod(part[0]);
 				}
 				langArt.setClaveRevista(resultElement[0].toString());
-				langArt.setJatsPDF(resultElement[1].toString());
 				listaClaves.add(langArt);
 			}
 		}
@@ -165,24 +151,19 @@ public class GenerarMapSiteArticulos {
 
 		return listaClaves;
 	}
-
+	//metodo pra obtener las revistas de base de datos y crear una lista de objetos con los resultados
 	public List<ModeloArticuloSitemaps> getClaveRevista() {
 
 		List<ModeloArticuloSitemaps> listaClaves = new ArrayList<ModeloArticuloSitemaps>();
 		List<Object[]> listaobjArt = null;
 		try {
-			// Corregido con JATS
 			Query qAux = em.createNativeQuery("select * from tblentrev");
-
-			// listaClaves = (List<Long>) qAux.getResultList();
-
 			listaobjArt = (List<Object[]>) qAux.getResultList();
 			for (Object[] resultElement : listaobjArt) {
 				ModeloArticuloSitemaps langArt = new ModeloArticuloSitemaps();
 				langArt.setClave(resultElement[1].toString());
-				langArt.setEdoJats(resultElement[1].toString());
+				langArt.setFechaUltMod(resultElement[1].toString());
 				langArt.setClaveRevista(resultElement[0].toString());
-				langArt.setJatsPDF(resultElement[1].toString());
 				listaClaves.add(langArt);
 			}
 		}
@@ -204,18 +185,12 @@ public class GenerarMapSiteArticulos {
 
 	public void escribirArchivo(String nombreArchivo, Urlset urlSet) {
 		try {
-//			File file = new File("C:/xmlMapas/todosHTTPS/"+nombreArchivo+".xml");	/*PARA EJECUTAR TODOS LOS SITEMAPS*/
-			File file = new File("C:/xmlMapas/" + nombreArchivo + ".xml"); /* PARA PROCESOS QUINCENALES */
+			File file = new File("C:/xmlMapas/" + nombreArchivo + ".xml"); 
 			JAXBContext jaxbContext = JAXBContext.newInstance(Urlset.class);
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			// jaxbMarshaller.setProperty("jaxb.encoding", "Unicode");
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			// jaxbMarshaller.setProperty(CharacterEscapeHandler.class.getName(),new
-			// CustomCharacterEscapeHandler());
-
 			jaxbMarshaller.marshal(urlSet, file);
-			// jaxbMarshaller.setProperty("jaxb.encoding", "UTF-8");
-			jaxbMarshaller.marshal(urlSet, System.out);
+			//jaxbMarshaller.marshal(urlSet, System.out); //para imprimir en consola
 
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -226,7 +201,6 @@ public class GenerarMapSiteArticulos {
 		GenerarMapSiteArticulos mapSite = new GenerarMapSiteArticulos();
 		try {
 			mapSite.setFechaUltimaModificacion("2021-06-30");
-			// mapSite.generarMapSiteArtXML();
 			mapSite.crearXMLArticulos();
 			mapSite.crearXMLrevistas();
 			System.exit(0);
